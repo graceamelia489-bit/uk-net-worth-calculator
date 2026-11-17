@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UK Net Worth Calculator (Free, Open Source)</title>
+<meta name="description" content="Free UK net worth calculator. Add up your savings, ISAs, pensions, property and investments, subtract your mortgage, loans and cards, and see your net worth in GBP. Nothing is stored or sent anywhere.">
+<style>
+  :root { --ink:#1d2433; --muted:#5b6475; --line:#e3e6ec; --accent:#0f6e56; --bg:#f7f8fa; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--ink); background:var(--bg); line-height:1.5; }
+  main { max-width:860px; margin:0 auto; padding:32px 20px 48px; }
+  h1 { font-size:1.9rem; margin:0 0 6px; }
+  .lead { color:var(--muted); margin:0 0 24px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:700px){ .grid { grid-template-columns:1fr; } }
+  section.card { background:#fff; border:1px solid var(--line); border-radius:10px; padding:18px 20px; }
+  h2 { font-size:1.1rem; margin:0 0 12px; }
+  label { display:flex; justify-content:space-between; align-items:center; gap:12px; margin:8px 0; font-size:.95rem; }
+  .field { display:flex; align-items:center; border:1px solid var(--line); border-radius:6px; padding:0 8px; background:#fff; }
+  .field span { color:var(--muted); }
+  input { width:120px; border:0; padding:7px 4px; font-size:.95rem; text-align:right; outline:none; }
+  .subtotal { border-top:1px solid var(--line); margin-top:12px; padding-top:10px; font-weight:600; display:flex; justify-content:space-between; }
+  .result { margin-top:20px; background:#fff; border:2px solid var(--accent); border-radius:10px; padding:20px; text-align:center; }
+  .result .big { font-size:2.2rem; font-weight:700; color:var(--accent); }
+  .result .split { display:flex; justify-content:center; gap:28px; flex-wrap:wrap; color:var(--muted); margin-top:8px; }
+  .note { font-size:.85rem; color:var(--muted); margin-top:20px; }
+  footer { font-size:.85rem; color:var(--muted); margin-top:28px; border-top:1px solid var(--line); padding-top:14px; }
+  a { color:var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>UK Net Worth Calculator</h1>
+  <p class="lead">Add up what you own, subtract what you owe, and see your net worth in pounds. Everything runs in your browser. Nothing is saved or sent anywhere.</p>
+
+  <div class="grid">
+    <section class="card" id="assets">
+      <h2>What you own (assets)</h2>
+      <label>Current &amp; savings accounts <span class="field"><span>£</span><input type="number" min="0" data-a="cash"></span></label>
+      <label>Premium Bonds <span class="field"><span>£</span><input type="number" min="0" data-a="pb"></span></label>
+      <label>ISAs (Cash, S&amp;S, Lifetime) <span class="field"><span>£</span><input type="number" min="0" data-a="isa"></span></label>
+      <label>Pensions (workplace, SIPP) <span class="field"><span>£</span><input type="number" min="0" data-a="pension" data-pension></span></label>
+      <label>Home (current market value) <span class="field"><span>£</span><input type="number" min="0" data-a="home" data-home></span></label>
+      <label>Other property <span class="field"><span>£</span><input type="number" min="0" data-a="prop"></span></label>
+      <label>Other investments (GIA, shares) <span class="field"><span>£</span><input type="number" min="0" data-a="inv"></span></label>
+      <label>Crypto (today's value) <span class="field"><span>£</span><input type="number" min="0" data-a="crypto"></span></label>
+      <label>Car(s) (resale value) <span class="field"><span>£</span><input type="number" min="0" data-a="car"></span></label>
+      <label>Other assets <span class="field"><span>£</span><input type="number" min="0" data-a="other"></span></label>
+      <div class="subtotal"><span>Total assets</span><span id="ta">£0</span></div>
+    </section>
+
+    <section class="card" id="liabilities">
+      <h2>What you owe (liabilities)</h2>
+      <label>Mortgage on your home <span class="field"><span>£</span><input type="number" min="0" data-l="mortgage" data-homedebt></span></label>
+      <label>Other mortgages <span class="field"><span>£</span><input type="number" min="0" data-l="mort2"></span></label>
+      <label>Credit cards <span class="field"><span>£</span><input type="number" min="0" data-l="cards"></span></label>
+      <label>Personal loans <span class="field"><span>£</span><input type="number" min="0" data-l="loans"></span></label>
+      <label>Car finance (PCP/HP settlement) <span class="field"><span>£</span><input type="number" min="0" data-l="carfin"></span></label>
+      <label>Overdrafts <span class="field"><span>£</span><input type="number" min="0" data-l="od"></span></label>
+      <label>Student loan <span class="field"><span>£</span><input type="number" min="0" data-l="student"></span></label>
+      <label>Other debts <span class="field"><span>£</span><input type="number" min="0" data-l="otherd"></span></label>
+      <div class="subtotal"><span>Total liabilities</span><span id="tl">£0</span></div>
+    </section>
+  </div>
+
+  <div class="result">
+    <div>Your net worth</div>
+    <div class="big" id="nw">£0</div>
+    <div class="split">
+      <span>Excluding pension: <strong id="nwx1">£0</strong></span>
+      <span>Excluding pension &amp; home equity: <strong id="nwx2">£0</strong></span>
+    </div>
+  </div>
+
+  <p class="note">Tips: value everything at what you could sell it for today, not what you paid. Many people leave Plan 2 student loans out because they are written off after 30 years. Recalculate on the same day each month and watch the trend rather than one figure. This tool is for information only and is not financial advice.</p>
+
+  <footer>
+    Open-source project. Free to use and copy.
+    If you would rather not update the numbers by hand, <a href="https://www.networthy.ai/">Networthy</a> tracks your net worth with real-time valuations for property, cars and crypto.
+  </footer>
+</main>
+<script>
+  const gbp = n => (n < 0 ? "-£" : "£") + Math.abs(n).toLocaleString("en-GB", {maximumFractionDigits:0});
+  const val = el => parseFloat(el.value) || 0;
+  function calc(){
+    let a = 0, l = 0, pension = 0, home = 0, homeDebt = 0;
+    document.querySelectorAll("[data-a]").forEach(el => { a += val(el); });
+    document.querySelectorAll("[data-l]").forEach(el => { l += val(el); });
+    document.querySelectorAll("[data-pension]").forEach(el => { pension += val(el); });
+    document.querySelectorAll("[data-home]").forEach(el => { home += val(el); });
+    document.querySelectorAll("[data-homedebt]").forEach(el => { homeDebt += val(el); });
+    const nw = a - l;
+    document.getElementById("ta").textContent = gbp(a);
+    document.getElementById("tl").textContent = gbp(l);
+    document.getElementById("nw").textContent = gbp(nw);
+    document.getElementById("nwx1").textContent = gbp(nw - pension);
+    document.getElementById("nwx2").textContent = gbp(nw - pension - (home - homeDebt));
+  }
+  document.querySelectorAll("input").forEach(el => el.addEventListener("input", calc));
+</script>
+</body>
+</html>
